@@ -1,0 +1,56 @@
+int timersignal= D1;
+int trigger= D6;
+int power=A3;
+int noPower=A4;
+//these are to count the time running
+unsigned long timerunning = 0;
+unsigned long timelast = 0;
+int timeroff=0;
+long difference=0;
+long val=-1000;
+int memory=0;
+int one=1;
+int lohi=0;
+
+void setup() {
+
+pinMode (timersignal,INPUT);
+pinMode (trigger,OUTPUT);
+pinMode (power,OUTPUT);
+pinMode (noPower,OUTPUT);
+
+digitalWrite(power,HIGH);
+digitalWrite(noPower,LOW);
+}
+
+void loop() {
+lohi=digitalRead(timersignal);                      //what is the current input signal?
+if(lohi==LOW)                                       //if low do the following
+{
+    if(memory==one)                                 //this if statement is for when the timer goes off and user turns it off
+    {
+        digitalWrite(trigger,HIGH);
+        delay(100);
+        digitalWrite(trigger,LOW);
+        memory=0;                                   //resets values so that timer can be used again without powering off
+        val=0;
+    }
+    timelast=millis();
+}
+else if(lohi==HIGH)                                 //if high do this instead
+{
+    timerunning=millis();
+    memory=1;                                       //set flag
+    difference=(timelast-timerunning+val);
+    if(difference<0)
+    {
+        
+        digitalWrite(trigger,HIGH);                 //send on signal
+        delay(100);
+        digitalWrite(trigger,LOW);
+        val=26000;                                   //change this to how long monkey cycle is. this is in miliseconds.
+        timelast=millis();
+    }
+}
+
+}
